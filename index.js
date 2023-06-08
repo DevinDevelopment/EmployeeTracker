@@ -43,13 +43,15 @@ function init() {
   // generateMarkdown will be a function we are calling from another file which is why import require is needed
   .then((response) =>{
     // writeToFile('GeneratedREADME.MD', generateMarkdown.generateMarkdown(response))
-    if(response.choice == "Quit"){
-      console.log('You have exited the db');
-      process.exit(1);
+    if(response.choice == "View All Departments"){
+      db.query('SELECT * FROM department;', function (err, results) {
+      console.log(results);
+      });
+      init();
     }
     else{
-      
-      init();
+      console.log('You have exited the db');
+      process.exit(1);
     }
   });
 }
