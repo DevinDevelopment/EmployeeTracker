@@ -10,6 +10,7 @@ SELECT title, dp_name as department, salary
 FROM roles
 JOIN department ON roles.department_id = department.id;
 
+-- showing employees
 SELECT first_name, last_name, title, dp_name AS department, salary, Manager_id AS Manager
 FROM employees
 JOIN roles ON employees.role_id = roles.id

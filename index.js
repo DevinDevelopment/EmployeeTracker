@@ -2,7 +2,20 @@
 // inquirer is a node.js library and is need to ask questions in command line and store answers
 // fs needed to gain access to file structor functions 
 const inquirer = require('inquirer');
+const mysql = require('mysql2');
 const fs = require('fs');
+
+const db = mysql.createConnection(
+  {
+    host: 'localhost',
+    // MySQL Username
+    user: 'root',
+    // TODO: Add MySQL Password
+    password: 'password1234',
+    database: 'employees_db'
+  },
+  console.log(`Connected to the employees_db database.`)
+);
 
 // this is used as a question bank
 const question = 'What would you like to do?';
@@ -46,8 +59,16 @@ function init() {
     if(response.choice == "View All Departments"){
       db.query('SELECT * FROM department;', function (err, results) {
       console.log(results);
-      });
+      console.log('\n');
       init();
+      });
+    }
+    else if(response.choice == "View All Employees"){
+      db.query('SELECT first_name, last_name, title, dp_name AS department, salary, Manager_id AS Manager FROM employees JOIN roles ON employees.role_id = roles.id JOIN department ON roles.department_id = department.id;', function (err, results) {
+        console.log(results);
+        console.log('\n');
+        init();
+      });
     }
     else{
       console.log('You have exited the db');
