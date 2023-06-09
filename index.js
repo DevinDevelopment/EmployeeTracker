@@ -35,6 +35,12 @@ const addDepartmentQuestion = [
   'What is the name of the department?'
 ]
 
+const addRoleQuestion = [
+  'What is the name of the role?',
+  'What is the salary of the role?',
+  'Which department does the role belong to?'
+]
+
 // this is a function created to write to a file. 
 // we will use this function in the .then section of the inquirer function.
 
@@ -91,18 +97,44 @@ function init() {
           {
             type: 'input',
             message: addDepartmentQuestion[0],
-            name: "newDepartment",
+            name: "dp_name"
           }
         ])
-          .then((response) => {
-            console.log(response.newDepartment);
-            db.query(`INSERT INTO department(dp_name) VAULES ${response.newDepartment};`, function (err, results) {
-              // console.log(results);
-              console.table(results);
-              console.log('\n');
-              init();
-            });
-          })
+        .then((response) =>{
+          console.log(response);
+          db.query("insert into department SET ?", response);
+          console.log('Department added to the database.');
+          console.log('\n');
+          init();
+     })
+    }
+    else if(response.choice == "Add Role"){
+      inquirer
+        .prompt([
+          {
+            type: 'input',
+            message: addRoleQuestion[0],
+            name: "title"
+          },
+          {
+            type: 'input',
+            message: addRoleQuestion[1],
+            name: "salary"
+          },
+          {
+            type: 'list',
+            message: addRoleQuestion[2],
+            name: "department_id",
+            choices: [
+              `SELECT dp_name FROM departments`
+          ]
+          }
+        ])
+        .then((response) =>{
+          console.log(response);
+          console.log('\n');
+          init();
+     })
     }
     else{
       console.log('You have exited the db');
