@@ -31,8 +31,13 @@ const choices = [
   'Quit'
 ]
 
+const addDepartmentQuestion = [
+  'What is the name of the department?'
+]
+
 // this is a function created to write to a file. 
 // we will use this function in the .then section of the inquirer function.
+
 function writeToFile(fileName, data) {
   fs.appendFile(fileName, data, (err) =>
     // TODO: Describe how this ternary operator works
@@ -58,17 +63,46 @@ function init() {
     // writeToFile('GeneratedREADME.MD', generateMarkdown.generateMarkdown(response))
     if(response.choice == "View All Departments"){
       db.query('SELECT * FROM department;', function (err, results) {
-      console.log(results);
+      // console.log(results);
+      console.table(results);
+      console.log('\n');
+      init();
+      });
+    }
+    else if(response.choice == "View All Roles"){
+      db.query('SELECT title, dp_name as department, salary FROM roles JOIN department ON roles.department_id = department.id;', function (err, results) {
+      // console.log(results);
+      console.table(results);
       console.log('\n');
       init();
       });
     }
     else if(response.choice == "View All Employees"){
       db.query('SELECT first_name, last_name, title, dp_name AS department, salary, Manager_id AS Manager FROM employees JOIN roles ON employees.role_id = roles.id JOIN department ON roles.department_id = department.id;', function (err, results) {
-        console.log(results);
+        // console.log(results);
+        console.table(results);
         console.log('\n');
         init();
       });
+    }
+    else if(response.choice == "Add Department"){
+      inquirer
+        .prompt([
+          {
+            type: 'input',
+            message: addDepartmentQuestion[0],
+            name: "newDepartment",
+          }
+        ])
+          .then((response) => {
+            console.log(response.newDepartment);
+            db.query(`INSERT INTO department(dp_name) VAULES ${response.newDepartment};`, function (err, results) {
+              // console.log(results);
+              console.table(results);
+              console.log('\n');
+              init();
+            });
+          })
     }
     else{
       console.log('You have exited the db');
