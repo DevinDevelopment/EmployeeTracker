@@ -50,6 +50,8 @@ function writeToFile(fileName, data) {
     err ? console.error(err) : console.log('Success'))
 }
 
+
+
 // this function is the actuall inquirer which will ask questions in the command line 
 // then will store answers in response
 function init() {
@@ -65,7 +67,7 @@ function init() {
   // take the respone(users answers) and call the writeToFile function we created
   // the data perameter will take the users response and push to our generateMarkdown function from the generateMarkdown file
   // generateMarkdown will be a function we are calling from another file which is why import require is needed
-  .then((response) =>{
+  .then(async (response) =>{
     // writeToFile('GeneratedREADME.MD', generateMarkdown.generateMarkdown(response))
     if(response.choice == "View All Departments"){
       db.query('SELECT * FROM department;', function (err, results) {
@@ -109,32 +111,38 @@ function init() {
      })
     }
     else if(response.choice == "Add Role"){
-      inquirer
-        .prompt([
-          {
-            type: 'input',
-            message: addRoleQuestion[0],
-            name: "title"
-          },
-          {
-            type: 'input',
-            message: addRoleQuestion[1],
-            name: "salary"
-          },
-          {
-            type: 'list',
-            message: addRoleQuestion[2],
-            name: "department_id",
-            choices: [
-              `SELECT dp_name FROM departments`
-          ]
-          }
-        ])
-        .then((response) =>{
-          console.log(response);
-          console.log('\n');
-          init();
-     })
+      var departments;
+      db.query('SELECT * FROM department;', function (err, results) {
+          departments = results.map(function(dept){
+            return dept.dp_name
+          });          
+        inquirer
+          .prompt([
+            {
+              type: 'input',
+              message: addRoleQuestion[0],
+              name: "title"
+            },
+            {
+              type: 'input',
+              message: addRoleQuestion[1],
+              name: "salary"
+            },
+            {
+              type: 'list',
+              message: addRoleQuestion[2],
+              name: "department_id",
+              choices: departments
+
+            }
+          ])
+          .then((response) =>{
+            db.query("insert into role SET ?", response);
+            console.log(response);
+            console.log('\n');
+            init();
+          })
+      })
     }
     else{
       console.log('You have exited the db');
