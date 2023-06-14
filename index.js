@@ -5,21 +5,21 @@ const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const fs = require('fs');
 
+// connection to database to add queries
 const db = mysql.createConnection(
   {
     host: 'localhost',
-    // MySQL Username
     user: 'root',
-    // TODO: Add MySQL Password
     password: 'password1234',
     database: 'employees_db'
   },
   console.log(`Connected to the employees_db database.`)
 );
 
-// this is used as a question bank
+// Main Question
 const question = 'What would you like to do?';
 
+// This is used as the choice bank for main question
 const choices = [
   'View All Employees',
   'Add Employee',
@@ -31,26 +31,24 @@ const choices = [
   'Quit'
 ]
 
+// Question for add department option
 const addDepartmentQuestion = [
   'What is the name of the department?'
 ]
 
+// Question for add role option
 const addRoleQuestion = [
   'What is the name of the role?',
   'What is the salary of the role?',
   'Which department does the role belong to?'
 ]
 
-// this is a function created to write to a file. 
-// we will use this function in the .then section of the inquirer function.
-
-function writeToFile(fileName, data) {
-  fs.appendFile(fileName, data, (err) =>
-    // TODO: Describe how this ternary operator works
-    err ? console.error(err) : console.log('Success'))
-}
-
-
+// Question for add employee option
+const addEmployeeQuestion = [
+  'What is the first name of the employee?',
+  'What is the last name of the employee?',
+  'What is the employees role?'
+]
 
 // this function is the actuall inquirer which will ask questions in the command line 
 // then will store answers in response
@@ -64,35 +62,34 @@ function init() {
       choices: choices,
     }
   ])
-  // take the respone(users answers) and call the writeToFile function we created
-  // the data perameter will take the users response and push to our generateMarkdown function from the generateMarkdown file
-  // generateMarkdown will be a function we are calling from another file which is why import require is needed
+  // this will display all records in the department table
   .then(async (response) =>{
-    // writeToFile('GeneratedREADME.MD', generateMarkdown.generateMarkdown(response))
     if(response.choice == "View All Departments"){
       db.query('SELECT * FROM department;', function (err, results) {
-      // console.log(results);
       console.table(results);
       console.log('\n');
       init();
       });
     }
+    // this will display all records in the roles table
     else if(response.choice == "View All Roles"){
       db.query('SELECT title, dp_name as department, salary FROM roles JOIN department ON roles.department_id = department.id;', function (err, results) {
-      // console.log(results);
       console.table(results);
       console.log('\n');
       init();
       });
     }
+
+    // this will display all records in the employees table
     else if(response.choice == "View All Employees"){
       db.query('SELECT first_name, last_name, title, dp_name AS department, salary, Manager_id AS Manager FROM employees JOIN roles ON employees.role_id = roles.id JOIN department ON roles.department_id = department.id;', function (err, results) {
-        // console.log(results);
         console.table(results);
         console.log('\n');
         init();
       });
     }
+
+    // if add dept was selected ask what the dp name would be 
     else if(response.choice == "Add Department"){
       inquirer
         .prompt([
@@ -102,6 +99,7 @@ function init() {
             name: "dp_name"
           }
         ])
+        // take the user response(db_name) and will create a new record in the department table with that name
         .then((response) =>{
           console.log(response);
           db.query("insert into department SET ?", response);
@@ -110,12 +108,19 @@ function init() {
           init();
      })
     }
+    // if add role was selected ask related questions needed to create role record
     else if(response.choice == "Add Role"){
+      // in order to have choices come from our database for the "which dept does this role belong to" question.
+      // we must map through all departments in the dept table and store in a variable to be used with inquirer
       var departments;
       db.query('SELECT * FROM department;', function (err, results) {
           departments = results.map(function(dept){
-            return dept.dp_name
-          });          
+            return {
+              name: dept.dp_name,
+              value: dept.id
+            }
+          });
+          console.log(departments);          
         inquirer
           .prompt([
             {
@@ -132,7 +137,40 @@ function init() {
               type: 'list',
               message: addRoleQuestion[2],
               name: "department_id",
-              choices: departments
+              choices: Object.values(departments)
+
+            }
+          ])
+          // takes users input and creates a new record in the role table
+          .then((response) =>{
+            db.query("insert into roles SET ?", response);
+            console.log(response);
+            console.log('\n');
+            init();
+          })
+      })
+    }
+    // if add employee was selected ask related questions needed to create employee record
+    else if(response.choice == "Add Employee"){
+      // in order to have choices come from our database for the "which role does this employee belong to" question.
+      // we must map through all roles in the role table and store in a variable to be used with inquirer
+      var roles;
+      db.query('SELECT * FROM roles;', function (err, results) {
+          roles = results.map(function(role){
+            return role.id
+          });          
+        inquirer
+          .prompt([
+            {
+              type: 'input',
+              message: addEmployeeQuestion[0],
+              name: "title"
+            },
+            {
+              type: 'list',
+              message: addEmployeeQuestion[2],
+              name: "role_id",
+              choices: roles
 
             }
           ])
