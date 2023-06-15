@@ -26,7 +26,6 @@ const choices = [
   'Update Employee Role',
   'View All Roles',
   'Add Role',
-  'Update Employee Role',
   'View All Departments',
   'Add Department',
   'Quit'
@@ -219,6 +218,7 @@ function init() {
       // in order to have choices come from our database for the "which role does this employee belong to" question.
       // we must map through all roles in the role table and store in a variable to be used with inquirer
       var roles;
+      var employees;
       db.query('SELECT * FROM role;', function (err, results) {
         db.query('SELECT * FROM employee;', function (err, results2) {
           roles = results.map(function(role){
@@ -233,13 +233,12 @@ function init() {
               value: e.id
             }
           });          
-          console.log(roles);
         inquirer
           .prompt([
             {
               type: 'list',
               message: updateEmployeeQuestion[0],
-              name: "first_name",
+              name: "id",
               choices: Object.values(employees)
 
             },
@@ -252,7 +251,8 @@ function init() {
             }
           ])
           .then((response) =>{
-            db.query('UPDATE employee SET role_id = ?', response);
+            console.log(response)
+            db.query('UPDATE employee SET role_id = ? WHERE id = ?', response);
             console.log('Employee updated.');
             console.log('\n');
             init();
