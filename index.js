@@ -26,6 +26,7 @@ const choices = [
   'Update Employee Role',
   'View All Roles',
   'Add Role',
+  'Update Employee Role',
   'View All Departments',
   'Add Department',
   'Quit'
@@ -49,6 +50,10 @@ const addEmployeeQuestion = [
   'What is the last name of the employee?',
   'What is the employees role?',
   'Who is the Employees manager?'
+]
+const updateEmployeeQuestion = [
+  "What employee's would you like to update?",
+  'Which role do you want to assign to the selected employee?'
 ]
 
 // this function is the actuall inquirer which will ask questions in the command line 
@@ -83,7 +88,11 @@ function init() {
 
     // this will display all records in the employees table
     else if(response.choice == "View All Employees"){
-      db.query('SELECT first_name, last_name, title, dp_name AS department, salary, Manager_id AS Manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id;', function (err, results) {
+      db.query(`SELECT e.first_name, e.last_name, title, dp_name AS department, salary, m.first_name AS Manager
+      FROM employee e
+      JOIN role ON e.role_id = role.id
+      JOIN department ON role.department_id = department.id
+      LEFT JOIN employee m ON m.id = e.Manager_id;`, function (err, results) {
         console.table(results);
         console.log('\n');
         init();
@@ -192,7 +201,7 @@ function init() {
             {
               type: 'list',
               message: addEmployeeQuestion[3],
-              name: "Manager",
+              name: "Manager_id",
               choices: Object.values(employees)
 
             }
@@ -203,7 +212,51 @@ function init() {
             console.log('\n');
             init();
           })
-          .then(() => {init()})
+        })
+      })
+    }
+    else if(response.choice == "Update Employee Role"){
+      // in order to have choices come from our database for the "which role does this employee belong to" question.
+      // we must map through all roles in the role table and store in a variable to be used with inquirer
+      var roles;
+      db.query('SELECT * FROM role;', function (err, results) {
+        db.query('SELECT * FROM employee;', function (err, results2) {
+          roles = results.map(function(role){
+            return {
+              name: role.title,
+              value: role.id
+            }
+          });          
+          employees = results2.map(function(e){
+            return {
+              name: e.first_name + " " + e.last_name,
+              value: e.id
+            }
+          });          
+          console.log(roles);
+        inquirer
+          .prompt([
+            {
+              type: 'list',
+              message: updateEmployeeQuestion[0],
+              name: "first_name",
+              choices: Object.values(employees)
+
+            },
+            {
+              type: 'list',
+              message: updateEmployeeQuestion[1],
+              name: "role_id",
+              choices: Object.values(roles)
+
+            }
+          ])
+          .then((response) =>{
+            db.query('UPDATE employee SET role_id = ?', response);
+            console.log('Employee updated.');
+            console.log('\n');
+            init();
+          })
         })
       })
     }
