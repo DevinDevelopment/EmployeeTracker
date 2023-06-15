@@ -1,6 +1,6 @@
 SELECT * FROM department;
 SELECT * FROM roles;
-SELECT * FROM employees;
+SELECT * FROM employee;
 
 
 SELECT * FROM department;
@@ -11,8 +11,8 @@ FROM roles
 JOIN department ON roles.department_id = department.id;
 
 -- showing employees
-SELECT first_name, last_name, title, dp_name AS department, salary, Manager_id AS Manager
-FROM employees
-JOIN roles ON employees.role_id = roles.id
-JOIN department ON roles.department_id = department.id;
-
+SELECT e.first_name, e.last_name, title, dp_name AS department, salary, m.first_name AS Manager
+FROM employee e
+JOIN role ON e.role_id = role.id
+JOIN department ON role.department_id = department.id
+LEFT JOIN employee m ON m.id = e.Manager_id;
