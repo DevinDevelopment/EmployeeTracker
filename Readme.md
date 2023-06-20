@@ -27,33 +27,22 @@ N/a
 
 - Clone the following repository after installing vs.code and node.js 
 
-- in terminal run npm i as it will download necessary dependencies such as express
+- in terminal run npm i as it will download necessary dependencies such as express and mysql12
 
 - for mysql download docker and start a mysql container. Documentation on this process online.
 
 ## Usage
 
 To use this application write "node index.js" this will start a series of questions in the command line which will be used to decide which sql query to run
-
-
+## Application screenshots
 ![Website screenshot](./assets/images/Capture1.PNG)
-
 
 ![Website screenshot](./assets/images/Capture2.PNG)
 
-
-![Website screenshot](./assets/images/Capture3.PNG)
-
-
-![Website screenshot](./assets/images/Capture4.PNG)
-
 ## Videos Demonstrating application:
 
-Table of contents showcase:
-https://drive.google.com/file/d/1kshl7OMiItqJV28xPVHjw4GpBXaipAzi/view
-
 application functionality showcase:
-https://drive.google.com/file/d/16km-5pONA6Og9bzfQDNFYe9a5YQ4Qbtl/view
+https://drive.google.com/file/d/1hrKjd-XVxv_x2z_B5D5iNi3Oog2eeyRL/view
 
 
 ## Deployment

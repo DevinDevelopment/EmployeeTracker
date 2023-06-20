@@ -110,7 +110,7 @@ function init() {
         ])
         // take the user response(db_name) and will create a new record in the department table with that name
         .then((response) =>{
-          console.log(response);
+
           db.query("insert into department SET ?", response);
           console.log('Department added to the database.');
           console.log('\n');
@@ -128,8 +128,7 @@ function init() {
               name: dept.dp_name,
               value: dept.id
             }
-          });
-          console.log(departments);          
+          });        
         inquirer
           .prompt([
             {
@@ -177,7 +176,6 @@ function init() {
               value: e.id
             }
           });          
-          console.log(roles);
         inquirer
           .prompt([
             {
