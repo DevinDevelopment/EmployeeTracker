@@ -251,8 +251,8 @@ function init() {
             }
           ])
           .then((response) =>{
-            console.log(response)
-            db.query('UPDATE employee SET role_id = ? WHERE id = ?', response);
+            // UPDATE employee SET role_id = ? WHERE id = ?
+            db.query(`UPDATE employee SET role_id = ${response.role_id} WHERE id = ${response.id}`, response);
             console.log('Employee updated.');
             console.log('\n');
             init();

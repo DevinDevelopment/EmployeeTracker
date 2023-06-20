@@ -58,7 +58,7 @@ https://drive.google.com/file/d/16km-5pONA6Og9bzfQDNFYe9a5YQ4Qbtl/view
 
 ## Deployment
 
-Repo: https://github.com/devv-nunn/ReadMeGenerator
+Repo: https://github.com/DevinDevelopment/EmployeeTracker
 
 # Tech Stack
 
@@ -66,6 +66,7 @@ HTML
 CSS
 JavaScript
 node.js
+mysql
 
 ## Credits
 
